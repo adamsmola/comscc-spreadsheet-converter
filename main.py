@@ -1,5 +1,7 @@
+import argparse
 from openpyxl import load_workbook
 import json
+from pathlib import Path
 
 def process_vehicles(sheet):
     CURRENT_YEAR = 2026
@@ -87,47 +89,55 @@ def process_tires(sheet):
 
 
 def main():
-    
-    wb = load_workbook('touring.xlsx', read_only=True, data_only=True)
+
+    parser = argparse.ArgumentParser(
+                    prog='sheetconverter',
+                    description='Converts COMSCC Classing Sheets to JSON')
+    parser.add_argument('-i', '--input', required=True)
+    parser.add_argument('-o', '--output-dir', default='./jsonfiles/')
+    args = parser.parse_args()
+
+    wb = load_workbook(args.input, read_only=True, data_only=True)
+
+    file_path = Path(args.output_dir + "vehicles.json")
+    file_path.parent.mkdir(parents=True, exist_ok=True)
 
     sheet = wb["Vehicles"]
     data = process_vehicles(sheet)
-    with open("vehicles.json", "w") as json_file:
+    with open(args.output_dir + "vehicles.json", "w") as json_file:
         json.dump(data, json_file, indent=4) 
 
     sheet = wb["Engine"]
     data = process_engine(sheet)
-    with open("engine.json", "w") as json_file:
+    with open(args.output_dir + "engine.json", "w") as json_file:
         json.dump(data, json_file, indent=4) 
 
     sheet = wb["Drivetrain"]
     data = process_drivetrain(sheet)
-    with open("drivetrain.json", "w") as json_file:
+    with open(args.output_dir + "drivetrain.json", "w") as json_file:
         json.dump(data, json_file, indent=4) 
 
     sheet = wb["Suspension"]
     data = process_suspension(sheet)
-    with open("suspension.json", "w") as json_file:
+    with open(args.output_dir + "suspension.json", "w") as json_file:
         json.dump(data, json_file, indent=4) 
 
     sheet = wb["Brakes"]
     data = process_brakes(sheet)
-    with open("brakes.json", "w") as json_file:
+    with open(args.output_dir + "brakes.json", "w") as json_file:
         json.dump(data, json_file, indent=4) 
 
     sheet = wb["Exterior"]
     data = process_exterior(sheet)
-    with open("exterior.json", "w") as json_file:
+    with open(args.output_dir + "exterior.json", "w") as json_file:
         json.dump(data, json_file, indent=4) 
 
     sheet = wb["Tires"]
     data = process_tires(sheet)
-    with open("tires.json", "w") as json_file:
+    with open(args.output_dir + "tires.json", "w") as json_file:
         json.dump(data, json_file, indent=4)     
 
  
-
-
 
 
 if __name__ == "__main__":
